@@ -22,6 +22,7 @@
 
   const CALENDAR_API_URL = 'https://daily-planner-calendar.bill-crean.workers.dev/agenda';
   const WEATHER_API_URL = 'https://api.open-meteo.com/v1/forecast';
+  const REVERSE_GEOCODE_URL = 'https://api.bigdatacloud.net/data/reverse-geocode-client';
   const AGENDA_REFRESH_MS = 5 * 60 * 1000;
   const WEATHER_REFRESH_MS = 15 * 60 * 1000;
 
@@ -244,6 +245,40 @@
     }
   }
 
+  function stateAbbreviation(regionCode = '') {
+    const match = String(regionCode).toUpperCase().match(/(?:^|-)US-([A-Z]{2})$/);
+    return match ? match[1] : '';
+  }
+
+  function placeLabelFromGeocode(data) {
+    const city = data.city || data.locality || data.principalSubdivision || '';
+    const state = stateAbbreviation(data.principalSubdivisionCode) || data.principalSubdivision || '';
+
+    if (city && state && city.toLowerCase() !== state.toLowerCase()) {
+      return `${city}, ${state}`;
+    }
+
+    return city || state || data.countryName || 'Current location';
+  }
+
+  async function getLocationLabel(latitude, longitude) {
+    const params = new URLSearchParams({
+      latitude: String(latitude),
+      longitude: String(longitude),
+      localityLanguage: 'en'
+    });
+
+    try {
+      const response = await fetch(`${REVERSE_GEOCODE_URL}?${params.toString()}`, { cache: 'no-store' });
+      if (!response.ok) throw new Error(`Reverse geocoder returned ${response.status}`);
+      const data = await response.json();
+      return placeLabelFromGeocode(data);
+    } catch (error) {
+      console.warn('Could not name current location.', error);
+      return 'Current location';
+    }
+  }
+
   function useFallbackLocation() {
     activeLocation = FALLBACK_LOCATION;
     locationEl.textContent = FALLBACK_LOCATION.label;
@@ -267,17 +302,26 @@
     locationEl.textContent = 'Finding your location…';
 
     navigator.geolocation.getCurrentPosition(
-      (position) => {
+      async (position) => {
+        const latitude = position.coords.latitude;
+        const longitude = position.coords.longitude;
+
         activeLocation = {
           label: 'Current location',
-          latitude: position.coords.latitude,
-          longitude: position.coords.longitude
+          latitude,
+          longitude
         };
-        locationEl.textContent = 'Current location';
+
+        // Weather can load immediately; resolving the human-readable place name
+        // should never delay the forecast.
+        loadWeather(activeLocation);
+
+        const resolvedLabel = await getLocationLabel(latitude, longitude);
+        activeLocation.label = resolvedLabel;
+        locationEl.textContent = resolvedLabel;
         locationButton.textContent = '✓';
         locationButton.disabled = false;
         locationButton.title = 'Refresh current location';
-        loadWeather(activeLocation);
       },
       () => {
         useFallbackLocation();

@@ -1,4 +1,4 @@
-# Daily Planner v0.4.0
+# Daily Planner v0.4.1
 
 A mobile-first daily dashboard. v0.3.0 adds the secure Cozi calendar proxy foundation.
 
@@ -61,3 +61,8 @@ The weather panel intentionally remains sample data until the weather integratio
 Adds live weather using Open-Meteo. On startup the browser requests location permission. When granted, weather follows the device's current latitude/longitude; if permission is denied, unavailable, or times out, the app falls back to Morristown, NJ.
 
 The weather panel now shows current temperature and conditions, today's high and low, maximum precipitation probability, and a compact set of upcoming hourly temperatures. Weather refreshes every 15 minutes and whenever the app becomes visible again. The location button can be used to retry/refresh the device location.
+
+
+## v0.4.1
+
+Location-label patch. When browser geolocation succeeds, the app reverse-geocodes the coordinates into a readable place label such as `Morristown, NJ`. The weather request begins immediately and does not wait on the location-name lookup. If reverse geocoding fails, the label falls back to `Current location`; if browser geolocation itself fails or is denied, the existing `Morristown, NJ` fallback remains in place.
