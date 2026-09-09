@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#f6f7f9" />
+  <title>Daily Planner</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <main class="app-shell">
+    <header class="topbar">
+      <div>
+        <p class="eyebrow" id="locationLabel">Morristown, NJ</p>
+        <h1 id="greeting">Good afternoon, Bill</h1>
+        <p class="date" id="dateLabel">Wednesday, September 9</p>
+      </div>
+      <button id="locationButton" class="icon-button" type="button" aria-label="Use my current location" title="Use my current location">⌖</button>
+    </header>
+
+    <section class="weather-panel" aria-labelledby="weatherHeading">
+      <div class="section-heading-row">
+        <h2 id="weatherHeading">Weather</h2>
+        <span class="status-pill" id="weatherStatus">Sample data</span>
+      </div>
+
+      <div class="weather-summary">
+        <div>
+          <div class="temperature-row">
+            <span class="weather-icon" aria-hidden="true">⛅</span>
+            <span class="temperature">72°</span>
+          </div>
+          <p class="conditions">Partly cloudy</p>
+        </div>
+        <div class="weather-details">
+          <p><strong>78°</strong> high</p>
+          <p><strong>61°</strong> low</p>
+          <p><strong>20%</strong> rain</p>
+        </div>
+      </div>
+
+      <div class="hourly-strip" aria-label="Hourly weather preview">
+        <div class="hour"><span>Now</span><strong>72°</strong></div>
+        <div class="hour"><span>3 PM</span><strong>75°</strong></div>
+        <div class="hour"><span>5 PM</span><strong>76°</strong></div>
+        <div class="hour"><span>7 PM</span><strong>70°</strong></div>
+      </div>
+    </section>
+
+    <section class="agenda-section" aria-labelledby="agendaHeading">
+      <div class="section-heading-row">
+        <h2 id="agendaHeading">Today</h2>
+        <span class="status-pill">Sample agenda</span>
+      </div>
+
+      <div class="agenda-list" id="agendaList">
+        <article class="agenda-item all-day">
+          <div class="time-block">All day</div>
+          <div class="event-block">
+            <h3>Family calendar item</h3>
+            <p>Cozi event preview</p>
+          </div>
+        </article>
+
+        <article class="agenda-item">
+          <div class="time-block">9:00 AM</div>
+          <div class="event-block">
+            <h3>Dentist appointment</h3>
+            <p>9:00–10:00 AM</p>
+          </div>
+        </article>
+
+        <article class="agenda-item">
+          <div class="time-block">12:30 PM</div>
+          <div class="event-block">
+            <h3>Lunch</h3>
+            <p>12:30–1:30 PM</p>
+          </div>
+        </article>
+
+        <article class="agenda-item">
+          <div class="time-block">7:00 PM</div>
+          <div class="event-block">
+            <h3>Evening meeting</h3>
+            <p>7:00–8:00 PM</p>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <p class="footer-note">Front-end prototype — live Cozi and weather connections come next.</p>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>

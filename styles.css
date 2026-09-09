@@ -1,0 +1,215 @@
+:root {
+  color-scheme: light;
+  --bg: #f6f7f9;
+  --panel: #ffffff;
+  --text: #172033;
+  --muted: #697386;
+  --line: #e2e6ec;
+  --accent: #315f86;
+  --accent-soft: #eaf1f7;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background: var(--bg);
+  color: var(--text);
+}
+
+button, input, select, textarea { font: inherit; }
+
+.app-shell {
+  width: min(760px, 100%);
+  margin: 0 auto;
+  padding: 24px 18px 40px;
+}
+
+.topbar {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 22px;
+}
+
+.eyebrow {
+  margin: 0 0 4px;
+  color: var(--muted);
+  font-size: 0.92rem;
+  font-weight: 600;
+}
+
+h1 {
+  margin: 0;
+  font-size: clamp(1.75rem, 7vw, 2.7rem);
+  line-height: 1.06;
+  letter-spacing: -0.035em;
+}
+
+.date {
+  margin: 8px 0 0;
+  color: var(--muted);
+  font-size: 1rem;
+}
+
+.icon-button {
+  width: 46px;
+  height: 46px;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  background: var(--panel);
+  color: var(--accent);
+  cursor: pointer;
+  font-size: 1.35rem;
+}
+
+.icon-button:focus-visible,
+.icon-button:hover {
+  outline: 3px solid var(--accent-soft);
+  border-color: var(--accent);
+}
+
+.weather-panel {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  padding: 18px;
+}
+
+.section-heading-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.section-heading-row h2 {
+  margin: 0;
+  font-size: 1.08rem;
+}
+
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  padding: 5px 9px;
+  font-size: 0.76rem;
+  font-weight: 700;
+}
+
+.weather-summary {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 22px;
+  margin-top: 18px;
+}
+
+.temperature-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.weather-icon { font-size: 2rem; }
+.temperature {
+  font-size: clamp(3rem, 12vw, 4.7rem);
+  line-height: 0.95;
+  letter-spacing: -0.06em;
+  font-weight: 700;
+}
+
+.conditions {
+  margin: 8px 0 0;
+  color: var(--muted);
+}
+
+.weather-details {
+  text-align: right;
+  color: var(--muted);
+  font-size: 0.94rem;
+}
+
+.weather-details p { margin: 4px 0; }
+.weather-details strong { color: var(--text); }
+
+.hourly-strip {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  margin-top: 18px;
+  padding-top: 16px;
+  border-top: 1px solid var(--line);
+}
+
+.hour {
+  min-width: 0;
+  text-align: center;
+}
+.hour span,
+.hour strong { display: block; }
+.hour span {
+  color: var(--muted);
+  font-size: 0.78rem;
+  margin-bottom: 4px;
+}
+.hour strong { font-size: 0.98rem; }
+
+.agenda-section { margin-top: 26px; }
+
+.agenda-list {
+  margin-top: 10px;
+  border-top: 1px solid var(--line);
+}
+
+.agenda-item {
+  display: grid;
+  grid-template-columns: 92px minmax(0, 1fr);
+  gap: 14px;
+  padding: 16px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.time-block {
+  color: var(--accent);
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
+.event-block h3 {
+  margin: 0;
+  font-size: 1rem;
+  line-height: 1.35;
+}
+
+.event-block p {
+  margin: 5px 0 0;
+  color: var(--muted);
+  font-size: 0.88rem;
+}
+
+.all-day .time-block { color: var(--muted); }
+
+.footer-note {
+  margin: 24px 0 0;
+  color: var(--muted);
+  font-size: 0.8rem;
+  text-align: center;
+}
+
+@media (max-width: 520px) {
+  .app-shell { padding: 20px 15px 32px; }
+  .weather-summary { align-items: center; }
+  .weather-details { font-size: 0.85rem; }
+  .agenda-item { grid-template-columns: 80px minmax(0, 1fr); }
+}
+
+@media (max-width: 380px) {
+  .weather-summary { align-items: flex-start; flex-direction: column; }
+  .weather-details { text-align: left; display: flex; gap: 14px; flex-wrap: wrap; }
+  .hourly-strip { grid-template-columns: repeat(2, 1fr); row-gap: 14px; }
+}
