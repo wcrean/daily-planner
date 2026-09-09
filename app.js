@@ -5,10 +5,27 @@
   const locationButton = document.getElementById('locationButton');
   const agendaList = document.getElementById('agendaList');
   const agendaStatus = document.getElementById('agendaStatus');
+  const weatherStatus = document.getElementById('weatherStatus');
+  const weatherIcon = document.getElementById('weatherIcon');
+  const currentTemp = document.getElementById('currentTemp');
+  const conditions = document.getElementById('conditions');
+  const highTemp = document.getElementById('highTemp');
+  const lowTemp = document.getElementById('lowTemp');
+  const rainChance = document.getElementById('rainChance');
+  const hourlyStrip = document.getElementById('hourlyStrip');
 
-  const fallbackLocation = 'Morristown, NJ';
+  const FALLBACK_LOCATION = {
+    label: 'Morristown, NJ',
+    latitude: 40.7968,
+    longitude: -74.4815
+  };
+
   const CALENDAR_API_URL = 'https://daily-planner-calendar.bill-crean.workers.dev/agenda';
+  const WEATHER_API_URL = 'https://api.open-meteo.com/v1/forecast';
   const AGENDA_REFRESH_MS = 5 * 60 * 1000;
+  const WEATHER_REFRESH_MS = 15 * 60 * 1000;
+
+  let activeLocation = FALLBACK_LOCATION;
 
   function getGreeting(hour) {
     if (hour < 12) return 'Good morning';
@@ -45,8 +62,6 @@
 
     if (!event.start?.allDay) return start === today;
 
-    // iCalendar all-day DTEND is exclusive. A one-day event that starts
-    // Sept 9 and ends Sept 10 therefore belongs to Sept 9 only.
     const end = event.end?.date || null;
     return start <= today && (!end || today < end);
   }
@@ -140,9 +155,107 @@
     }
   }
 
+  function weatherCodeInfo(code, isDay = 1) {
+    const day = Boolean(isDay);
+    if (code === 0) return { label: 'Clear', icon: day ? '☀️' : '🌙' };
+    if (code === 1) return { label: 'Mostly clear', icon: day ? '🌤️' : '🌙' };
+    if (code === 2) return { label: 'Partly cloudy', icon: '⛅' };
+    if (code === 3) return { label: 'Cloudy', icon: '☁️' };
+    if ([45, 48].includes(code)) return { label: 'Foggy', icon: '🌫️' };
+    if ([51, 53, 55, 56, 57].includes(code)) return { label: 'Drizzle', icon: '🌦️' };
+    if ([61, 63, 65, 66, 67, 80, 81, 82].includes(code)) return { label: 'Rain', icon: '🌧️' };
+    if ([71, 73, 75, 77, 85, 86].includes(code)) return { label: 'Snow', icon: '🌨️' };
+    if ([95, 96, 99].includes(code)) return { label: 'Thunderstorms', icon: '⛈️' };
+    return { label: 'Weather', icon: '🌡️' };
+  }
+
+  function roundTemp(value) {
+    return Number.isFinite(value) ? Math.round(value) : null;
+  }
+
+  function formatHourLabel(isoTime, index) {
+    if (index === 0) return 'Now';
+    const hour = Number(isoTime?.slice(11, 13));
+    if (!Number.isFinite(hour)) return 'Later';
+    const date = new Date(2000, 0, 1, hour, 0);
+    return new Intl.DateTimeFormat('en-US', { hour: 'numeric' }).format(date);
+  }
+
+  function renderHourly(data) {
+    const times = data.hourly?.time || [];
+    const temps = data.hourly?.temperature_2m || [];
+    const currentTime = data.current?.time;
+    if (!times.length || !temps.length || !currentTime) return;
+
+    let startIndex = times.findIndex((time) => time >= currentTime);
+    if (startIndex < 0) startIndex = Math.max(0, times.length - 1);
+
+    const indexes = [0, 2, 4, 6]
+      .map((offset) => Math.min(startIndex + offset, times.length - 1))
+      .filter((value, index, array) => array.indexOf(value) === index);
+
+    hourlyStrip.innerHTML = indexes.map((hourIndex, displayIndex) => {
+      const temp = roundTemp(temps[hourIndex]);
+      return `<div class="hour"><span>${escapeHtml(formatHourLabel(times[hourIndex], displayIndex))}</span><strong>${temp == null ? '—' : `${temp}°`}</strong></div>`;
+    }).join('');
+  }
+
+  function renderWeather(data) {
+    const current = data.current || {};
+    const daily = data.daily || {};
+    const info = weatherCodeInfo(current.weather_code, current.is_day);
+
+    weatherIcon.textContent = info.icon;
+    currentTemp.textContent = `${roundTemp(current.temperature_2m) ?? '—'}°`;
+    conditions.textContent = info.label;
+    highTemp.textContent = `${roundTemp(daily.temperature_2m_max?.[0]) ?? '—'}°`;
+    lowTemp.textContent = `${roundTemp(daily.temperature_2m_min?.[0]) ?? '—'}°`;
+    rainChance.textContent = `${Math.round(daily.precipitation_probability_max?.[0] ?? 0)}%`;
+    renderHourly(data);
+  }
+
+  async function loadWeather(location = activeLocation) {
+    weatherStatus.textContent = 'Loading…';
+    weatherStatus.classList.remove('status-error');
+
+    const params = new URLSearchParams({
+      latitude: String(location.latitude),
+      longitude: String(location.longitude),
+      current: 'temperature_2m,weather_code,is_day',
+      hourly: 'temperature_2m,precipitation_probability',
+      daily: 'weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max',
+      temperature_unit: 'fahrenheit',
+      precipitation_unit: 'inch',
+      timezone: 'auto',
+      forecast_days: '2'
+    });
+
+    try {
+      const response = await fetch(`${WEATHER_API_URL}?${params.toString()}`, { cache: 'no-store' });
+      if (!response.ok) throw new Error(`Weather API returned ${response.status}`);
+      const data = await response.json();
+      renderWeather(data);
+      weatherStatus.textContent = 'Live weather';
+    } catch (error) {
+      console.error(error);
+      weatherStatus.textContent = 'Weather unavailable';
+      weatherStatus.classList.add('status-error');
+      conditions.textContent = 'Couldn\'t load weather right now.';
+    }
+  }
+
+  function useFallbackLocation() {
+    activeLocation = FALLBACK_LOCATION;
+    locationEl.textContent = FALLBACK_LOCATION.label;
+    locationButton.textContent = '⌖';
+    locationButton.disabled = false;
+    locationButton.title = 'Use my current location';
+    loadWeather(activeLocation);
+  }
+
   function requestLocation() {
     if (!('geolocation' in navigator)) {
-      locationEl.textContent = fallbackLocation;
+      useFallbackLocation();
       locationButton.disabled = true;
       locationButton.title = 'Location is not supported in this browser';
       return;
@@ -151,37 +264,43 @@
     locationButton.disabled = true;
     locationButton.textContent = '…';
     locationButton.title = 'Requesting location';
+    locationEl.textContent = 'Finding your location…';
 
     navigator.geolocation.getCurrentPosition(
       (position) => {
-        const { latitude, longitude } = position.coords;
-        locationEl.textContent = `Current location · ${latitude.toFixed(3)}, ${longitude.toFixed(3)}`;
+        activeLocation = {
+          label: 'Current location',
+          latitude: position.coords.latitude,
+          longitude: position.coords.longitude
+        };
+        locationEl.textContent = 'Current location';
         locationButton.textContent = '✓';
-        locationButton.title = 'Current location enabled';
+        locationButton.disabled = false;
+        locationButton.title = 'Refresh current location';
+        loadWeather(activeLocation);
       },
       () => {
-        locationEl.textContent = fallbackLocation;
-        locationButton.textContent = '⌖';
-        locationButton.disabled = false;
-        locationButton.title = 'Location unavailable — using Morristown';
+        useFallbackLocation();
       },
-      { enableHighAccuracy: false, timeout: 8000, maximumAge: 600000 }
+      { enableHighAccuracy: false, timeout: 8000, maximumAge: 10 * 60 * 1000 }
     );
   }
 
   renderDateAndGreeting();
   loadAgenda();
+  requestLocation();
 
   locationButton.addEventListener('click', requestLocation);
 
-  // Keep the greeting/date fresh if the planner is left open, and refresh Cozi
-  // periodically without requiring a manual reload.
   setInterval(renderDateAndGreeting, 60 * 1000);
   setInterval(loadAgenda, AGENDA_REFRESH_MS);
+  setInterval(() => loadWeather(activeLocation), WEATHER_REFRESH_MS);
+
   document.addEventListener('visibilitychange', () => {
     if (document.visibilityState === 'visible') {
       renderDateAndGreeting();
       loadAgenda();
+      loadWeather(activeLocation);
     }
   });
 })();

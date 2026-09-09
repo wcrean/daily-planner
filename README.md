@@ -1,4 +1,4 @@
-# Daily Planner v0.3.0
+# Daily Planner v0.4.0
 
 A mobile-first daily dashboard. v0.3.0 adds the secure Cozi calendar proxy foundation.
 
@@ -54,3 +54,10 @@ The front end now reads the live Cozi agenda from:
 It shows only events that occur today, handles the exclusive end date used by all-day iCalendar events, separates a leading `Person:` prefix into a badge, marks recurring events, and refreshes the agenda automatically every five minutes and whenever the page becomes visible again.
 
 The weather panel intentionally remains sample data until the weather integration step.
+
+
+## v0.4.0
+
+Adds live weather using Open-Meteo. On startup the browser requests location permission. When granted, weather follows the device's current latitude/longitude; if permission is denied, unavailable, or times out, the app falls back to Morristown, NJ.
+
+The weather panel now shows current temperature and conditions, today's high and low, maximum precipitation probability, and a compact set of upcoming hourly temperatures. Weather refreshes every 15 minutes and whenever the app becomes visible again. The location button can be used to retry/refresh the device location.

@@ -11,7 +11,7 @@
   <main class="app-shell">
     <header class="topbar">
       <div>
-        <p class="eyebrow" id="locationLabel">Morristown, NJ</p>
+        <p class="eyebrow" id="locationLabel">Finding your location…</p>
         <h1 id="greeting">Good afternoon, Bill</h1>
         <p class="date" id="dateLabel">Wednesday, September 9</p>
       </div>
@@ -21,36 +21,36 @@
     <section class="weather-panel" aria-labelledby="weatherHeading">
       <div class="section-heading-row">
         <h2 id="weatherHeading">Weather</h2>
-        <span class="status-pill" id="weatherStatus">Sample data</span>
+        <span class="status-pill" id="weatherStatus">Loading…</span>
       </div>
 
       <div class="weather-summary">
         <div>
           <div class="temperature-row">
-            <span class="weather-icon" aria-hidden="true">⛅</span>
-            <span class="temperature">72°</span>
+            <span class="weather-icon" id="weatherIcon" aria-hidden="true">—</span>
+            <span class="temperature" id="currentTemp">—°</span>
           </div>
-          <p class="conditions">Partly cloudy</p>
+          <p class="conditions" id="conditions">Loading current conditions…</p>
         </div>
         <div class="weather-details">
-          <p><strong>78°</strong> high</p>
-          <p><strong>61°</strong> low</p>
-          <p><strong>20%</strong> rain</p>
+          <p><strong id="highTemp">—°</strong> high</p>
+          <p><strong id="lowTemp">—°</strong> low</p>
+          <p><strong id="rainChance">—%</strong> rain</p>
         </div>
       </div>
 
-      <div class="hourly-strip" aria-label="Hourly weather preview">
-        <div class="hour"><span>Now</span><strong>72°</strong></div>
-        <div class="hour"><span>3 PM</span><strong>75°</strong></div>
-        <div class="hour"><span>5 PM</span><strong>76°</strong></div>
-        <div class="hour"><span>7 PM</span><strong>70°</strong></div>
+      <div class="hourly-strip" id="hourlyStrip" aria-label="Hourly weather preview">
+        <div class="hour"><span>Now</span><strong>—°</strong></div>
+        <div class="hour"><span>Later</span><strong>—°</strong></div>
+        <div class="hour"><span>Later</span><strong>—°</strong></div>
+        <div class="hour"><span>Later</span><strong>—°</strong></div>
       </div>
     </section>
 
     <section class="agenda-section" aria-labelledby="agendaHeading">
       <div class="section-heading-row">
         <h2 id="agendaHeading">Today</h2>
-        <span class="status-pill" id="agendaStatus">Sample agenda</span>
+        <span class="status-pill" id="agendaStatus">Loading…</span>
       </div>
 
       <div class="agenda-list" id="agendaList" aria-live="polite">
@@ -58,7 +58,7 @@
       </div>
     </section>
 
-    <p class="footer-note">v0.3.0 — live Cozi agenda; live weather comes next.</p>
+    <p class="footer-note">v0.4.0 — live Cozi agenda + live location-aware weather.</p>
   </main>
 
   <script src="app.js"></script>
