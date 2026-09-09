@@ -1,0 +1,12 @@
+{
+  "name": "daily-planner-calendar",
+  "private": true,
+  "version": "0.2.0",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy"
+  },
+  "devDependencies": {
+    "wrangler": "^4.0.0"
+  }
+}

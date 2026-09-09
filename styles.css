@@ -213,3 +213,9 @@ h1 {
   .weather-details { text-align: left; display: flex; gap: 14px; flex-wrap: wrap; }
   .hourly-strip { grid-template-columns: repeat(2, 1fr); row-gap: 14px; }
 }
+
+.empty-state {
+  padding: 22px 0;
+  color: var(--muted);
+  border-bottom: 1px solid var(--line);
+}
