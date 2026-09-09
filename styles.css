@@ -219,3 +219,33 @@ h1 {
   color: var(--muted);
   border-bottom: 1px solid var(--line);
 }
+
+
+.event-title-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.event-title-row h3 {
+  min-width: 0;
+}
+
+.person-badge {
+  display: inline-flex;
+  align-items: center;
+  flex: 0 0 auto;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 2px 7px;
+  color: var(--muted);
+  background: var(--panel);
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+.status-error {
+  color: #8b2f2f;
+  background: #f8eaea;
+}

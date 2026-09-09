@@ -1,6 +1,6 @@
-# Daily Planner v0.2.0
+# Daily Planner v0.3.0
 
-A mobile-first daily dashboard. v0.2.0 adds the secure Cozi calendar proxy foundation.
+A mobile-first daily dashboard. v0.3.0 adds the secure Cozi calendar proxy foundation.
 
 ## Front end
 
@@ -43,3 +43,14 @@ When Wrangler prompts for the secret, paste the private Cozi feed URL there. Do 
 ## Privacy note
 
 This setup protects the private Cozi feed URL. The `/agenda` endpoint returns only sanitized event fields, not the feed URL. Because the GitHub Pages app is public, this initial version is not strong authentication for the event data itself. If full privacy is desired, add an authenticated access layer before treating the app as private.
+
+
+## v0.3.0
+
+The front end now reads the live Cozi agenda from:
+
+`https://daily-planner-calendar.bill-crean.workers.dev/agenda`
+
+It shows only events that occur today, handles the exclusive end date used by all-day iCalendar events, separates a leading `Person:` prefix into a badge, marks recurring events, and refreshes the agenda automatically every five minutes and whenever the page becomes visible again.
+
+The weather panel intentionally remains sample data until the weather integration step.

@@ -53,42 +53,12 @@
         <span class="status-pill" id="agendaStatus">Sample agenda</span>
       </div>
 
-      <div class="agenda-list" id="agendaList">
-        <article class="agenda-item all-day">
-          <div class="time-block">All day</div>
-          <div class="event-block">
-            <h3>Family calendar item</h3>
-            <p>Cozi event preview</p>
-          </div>
-        </article>
-
-        <article class="agenda-item">
-          <div class="time-block">9:00 AM</div>
-          <div class="event-block">
-            <h3>Dentist appointment</h3>
-            <p>9:00–10:00 AM</p>
-          </div>
-        </article>
-
-        <article class="agenda-item">
-          <div class="time-block">12:30 PM</div>
-          <div class="event-block">
-            <h3>Lunch</h3>
-            <p>12:30–1:30 PM</p>
-          </div>
-        </article>
-
-        <article class="agenda-item">
-          <div class="time-block">7:00 PM</div>
-          <div class="event-block">
-            <h3>Evening meeting</h3>
-            <p>7:00–8:00 PM</p>
-          </div>
-        </article>
+      <div class="agenda-list" id="agendaList" aria-live="polite">
+        <div class="empty-state">Loading your Cozi agenda…</div>
       </div>
     </section>
 
-    <p class="footer-note">v0.2.0 — secure Cozi calendar proxy ready; live weather comes next.</p>
+    <p class="footer-note">v0.3.0 — live Cozi agenda; live weather comes next.</p>
   </main>
 
   <script src="app.js"></script>
