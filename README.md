@@ -1,4 +1,4 @@
-# Daily Planner v0.5.1
+# Daily Planner v0.5.2
 
 A mobile-first daily dashboard. v0.3.0 adds the secure Cozi calendar proxy foundation.
 
@@ -96,3 +96,14 @@ Sports timing/efficiency patch:
 - The sports schedule date is based on the Eastern calendar day.
 - Removed the 15-minute repeating sports refresh. Sports loads on initial app open and when the page becomes visible again.
 - Weather keeps its existing 15-minute refresh because conditions can change during the day.
+
+
+## v0.5.2
+
+Adds visual identity for the installed web app and browser tab:
+
+- Custom Daily Planner calendar/weather app icon
+- Browser favicon in ICO and PNG sizes
+- iPhone/iPad Apple touch icon
+- Web app manifest for supported mobile/desktop installation
+- No functional changes to agenda, weather, or sports behavior
