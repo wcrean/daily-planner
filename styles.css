@@ -249,3 +249,64 @@ h1 {
   color: #8b2f2f;
   background: #f8eaea;
 }
+
+
+/* Sports */
+.sports-section {
+  margin-top: 28px;
+}
+
+.sports-list {
+  display: grid;
+  gap: 10px;
+}
+
+.sports-item {
+  display: grid;
+  grid-template-columns: 82px minmax(0, 1fr);
+  gap: 14px;
+  align-items: center;
+  padding: 16px 0;
+  border-top: 1px solid var(--border);
+}
+
+.sports-item:first-child {
+  border-top: 0;
+}
+
+.sports-time {
+  font-weight: 700;
+  color: var(--text);
+  white-space: nowrap;
+}
+
+.sports-matchup {
+  min-width: 0;
+}
+
+.sports-matchup h3 {
+  margin: 0;
+  font-size: 1rem;
+  line-height: 1.35;
+}
+
+.sports-matchup p {
+  margin: 4px 0 0;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+@media (max-width: 480px) {
+  .sports-item {
+    grid-template-columns: 72px minmax(0, 1fr);
+    gap: 10px;
+  }
+}
+
+.heading-note {
+  font-size: 0.72rem;
+  font-weight: 500;
+  color: var(--muted);
+  margin-left: 0.35rem;
+  white-space: nowrap;
+}

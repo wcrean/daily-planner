@@ -1,4 +1,4 @@
-# Daily Planner v0.4.1
+# Daily Planner v0.5.1
 
 A mobile-first daily dashboard. v0.3.0 adds the secure Cozi calendar proxy foundation.
 
@@ -63,6 +63,36 @@ Adds live weather using Open-Meteo. On startup the browser requests location per
 The weather panel now shows current temperature and conditions, today's high and low, maximum precipitation probability, and a compact set of upcoming hourly temperatures. Weather refreshes every 15 minutes and whenever the app becomes visible again. The location button can be used to retry/refresh the device location.
 
 
-## v0.4.1
+## v0.5.0
 
 Location-label patch. When browser geolocation succeeds, the app reverse-geocodes the coordinates into a readable place label such as `Morristown, NJ`. The weather request begins immediately and does not wait on the location-name lookup. If reverse geocoding fails, the label falls back to `Current location`; if browser geolocation itself fails or is denied, the existing `Morristown, NJ` fallback remains in place.
+
+
+## v0.5.0 — Sports
+
+Adds a bottom-of-page Sports section. It checks today’s MLB, NBA, NFL, college-football and men’s-college-basketball schedules and filters them to Bill’s favorite teams:
+
+- Boston Red Sox
+- Arizona Diamondbacks
+- Boston Celtics
+- Phoenix Suns
+- New England Patriots
+- Arizona Cardinals
+- SMU Mustangs Football
+- SMU Mustangs Basketball
+- Notre Dame Football
+- Boston College Football
+- Arizona State Football
+
+Games are shown in Eastern Time (America/New_York) order with opponent and home/away indicator. The Sports heading explicitly notes “All times ET.” If none of those teams play today, the card says so. Sports data is loaded from ESPN’s public scoreboard endpoints when the app opens and when the page becomes visible again; there is no repeating sports refresh timer.
+
+
+## v0.5.1
+
+Sports timing/efficiency patch:
+
+- All game times are explicitly formatted in Eastern Time (`America/New_York`).
+- The Sports card displays `All times ET`.
+- The sports schedule date is based on the Eastern calendar day.
+- Removed the 15-minute repeating sports refresh. Sports loads on initial app open and when the page becomes visible again.
+- Weather keeps its existing 15-minute refresh because conditions can change during the day.

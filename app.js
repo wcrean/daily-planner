@@ -13,6 +13,8 @@
   const lowTemp = document.getElementById('lowTemp');
   const rainChance = document.getElementById('rainChance');
   const hourlyStrip = document.getElementById('hourlyStrip');
+  const sportsList = document.getElementById('sportsList');
+  const sportsStatus = document.getElementById('sportsStatus');
 
   const FALLBACK_LOCATION = {
     label: 'Morristown, NJ',
@@ -25,6 +27,28 @@
   const REVERSE_GEOCODE_URL = 'https://api.bigdatacloud.net/data/reverse-geocode-client';
   const AGENDA_REFRESH_MS = 5 * 60 * 1000;
   const WEATHER_REFRESH_MS = 15 * 60 * 1000;
+
+  const SPORTS_SOURCES = [
+    { sport: 'baseball', league: 'mlb', limit: 40 },
+    { sport: 'basketball', league: 'nba', limit: 40 },
+    { sport: 'football', league: 'nfl', limit: 40 },
+    { sport: 'football', league: 'college-football', limit: 200 },
+    { sport: 'basketball', league: 'mens-college-basketball', limit: 400 }
+  ];
+
+  const FAVORITE_TEAMS = new Map([
+    ['baseball/mlb/2', 'Boston Red Sox'],
+    ['baseball/mlb/29', 'Arizona Diamondbacks'],
+    ['basketball/nba/2', 'Boston Celtics'],
+    ['basketball/nba/21', 'Phoenix Suns'],
+    ['football/nfl/17', 'New England Patriots'],
+    ['football/nfl/22', 'Arizona Cardinals'],
+    ['football/college-football/2567', 'SMU Mustangs Football'],
+    ['football/college-football/87', 'Notre Dame Football'],
+    ['football/college-football/103', 'Boston College Football'],
+    ['football/college-football/9', 'Arizona State Football'],
+    ['basketball/mens-college-basketball/2567', 'SMU Mustangs Basketball']
+  ]);
 
   let activeLocation = FALLBACK_LOCATION;
 
@@ -79,7 +103,8 @@
     const date = new Date(2000, 0, 1, parts.hour, parts.minute);
     return new Intl.DateTimeFormat('en-US', {
       hour: 'numeric',
-      minute: '2-digit'
+      minute: '2-digit',
+      timeZone: 'America/New_York'
     }).format(date);
   }
 
@@ -279,6 +304,129 @@
     }
   }
 
+  function sportsDateKey(date = new Date()) {
+    const parts = new Intl.DateTimeFormat('en-US', {
+      timeZone: 'America/New_York',
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit'
+    }).formatToParts(date);
+
+    const values = Object.fromEntries(parts.map((part) => [part.type, part.value]));
+    return `${values.year}${values.month}${values.day}`;
+  }
+
+  function favoriteTeamForCompetition(source, competition) {
+    const competitors = competition?.competitors || [];
+    for (const competitor of competitors) {
+      const id = String(competitor?.team?.id || '');
+      const key = `${source.sport}/${source.league}/${id}`;
+      if (FAVORITE_TEAMS.has(key)) {
+        return {
+          competitor,
+          label: FAVORITE_TEAMS.get(key)
+        };
+      }
+    }
+    return null;
+  }
+
+  function opponentForCompetition(competition, favoriteCompetitor) {
+    return (competition?.competitors || []).find((item) => item !== favoriteCompetitor) || null;
+  }
+
+  function formatGameTime(event) {
+    const detail = event?.status?.type?.detail || '';
+    if (/TBD|TBA/i.test(detail)) return 'TBD';
+
+    const date = new Date(event.date);
+    if (Number.isNaN(date.getTime())) return 'TBD';
+
+    return new Intl.DateTimeFormat('en-US', {
+      hour: 'numeric',
+      minute: '2-digit',
+      timeZone: 'America/New_York'
+    }).format(date);
+  }
+
+  function gameSortValue(event) {
+    const date = new Date(event.date);
+    return Number.isNaN(date.getTime()) ? Number.MAX_SAFE_INTEGER : date.getTime();
+  }
+
+  function normalizeSportsEvents(source, data) {
+    const results = [];
+
+    for (const event of data.events || []) {
+      const competition = event.competitions?.[0];
+      if (!competition) continue;
+
+      const favorite = favoriteTeamForCompetition(source, competition);
+      if (!favorite) continue;
+
+      const opponent = opponentForCompetition(competition, favorite.competitor);
+      const opponentName = opponent?.team?.shortDisplayName || opponent?.team?.displayName || 'Opponent TBD';
+      const homeAway = favorite.competitor.homeAway === 'home' ? 'vs' : '@';
+
+      results.push({
+        id: `${source.sport}-${source.league}-${event.id}`,
+        team: favorite.label,
+        opponent: opponentName,
+        homeAway,
+        date: event.date,
+        timeLabel: formatGameTime(event),
+        sortValue: gameSortValue(event),
+        league: source.league
+      });
+    }
+
+    return results;
+  }
+
+  function renderSports(games) {
+    games.sort((a, b) => a.sortValue - b.sortValue || a.team.localeCompare(b.team));
+
+    if (!games.length) {
+      sportsList.innerHTML = '<div class="empty-state">None of your favorite teams are playing today.</div>';
+      return;
+    }
+
+    sportsList.innerHTML = games.map((game) => `
+      <article class="sports-item">
+        <div class="sports-time">${escapeHtml(game.timeLabel)}</div>
+        <div class="sports-matchup">
+          <h3>${escapeHtml(game.team)}</h3>
+          <p>${escapeHtml(game.homeAway)} ${escapeHtml(game.opponent)}</p>
+        </div>
+      </article>
+    `).join('');
+  }
+
+  async function loadSports() {
+    sportsStatus.textContent = 'Loading…';
+    sportsStatus.classList.remove('status-error');
+
+    const date = sportsDateKey();
+
+    try {
+      const responses = await Promise.all(SPORTS_SOURCES.map(async (source) => {
+        const url = `https://site.api.espn.com/apis/site/v2/sports/${source.sport}/${source.league}/scoreboard?dates=${date}&limit=${source.limit}`;
+        const response = await fetch(url, { cache: 'no-store' });
+        if (!response.ok) throw new Error(`${source.league} returned ${response.status}`);
+        return { source, data: await response.json() };
+      }));
+
+      const games = responses.flatMap(({ source, data }) => normalizeSportsEvents(source, data));
+      renderSports(games);
+      sportsStatus.textContent = 'Today';
+    } catch (error) {
+      console.error('Sports load failed', error);
+      sportsStatus.textContent = 'Sports unavailable';
+      sportsStatus.classList.add('status-error');
+      sportsList.innerHTML = '<div class="empty-state">Couldn\'t load today\'s sports schedule right now.</div>';
+    }
+  }
+
   function useFallbackLocation() {
     activeLocation = FALLBACK_LOCATION;
     locationEl.textContent = FALLBACK_LOCATION.label;
@@ -332,6 +480,7 @@
 
   renderDateAndGreeting();
   loadAgenda();
+  loadSports();
   requestLocation();
 
   locationButton.addEventListener('click', requestLocation);
@@ -345,6 +494,7 @@
       renderDateAndGreeting();
       loadAgenda();
       loadWeather(activeLocation);
+      loadSports();
     }
   });
 })();
